@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function SchoolCatalog() {
   const [courses, setCourses] = useState({})
+  const [searchValue, setSearchValue] = useState('')
 
   // Fetch from courses.json
   useEffect(() => {
@@ -21,6 +22,11 @@ export default function SchoolCatalog() {
     getCourses();
   }, [])
 
+  // Watch the search value
+  useEffect(() => {
+    // this need to update the table
+  }, [searchValue])
+
   // Delete later. This is just to see what courses is
   useEffect(() => {
     console.log('Courses set: ', courses);
@@ -29,7 +35,7 @@ export default function SchoolCatalog() {
   return (
     <div className="school-catalog">
       <h1>School Catalog</h1>
-      <input type="text" placeholder="Search" />
+      <input type="text" placeholder="Search" value={searchValue} onChange={(e) => setSearchValue(e.target.value)}/>
       <table>
         <thead>
           <tr>
