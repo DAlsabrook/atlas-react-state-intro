@@ -1,4 +1,31 @@
+import { useState, useEffect } from "react";
+
 export default function SchoolCatalog() {
+  const [courses, setCourses] = useState({})
+
+  // Fetch from courses.json
+  useEffect(() => {
+    const getCourses = async () => {
+      const response = await fetch('/api/courses.json');
+      if (response.ok) {
+        try {
+          const coursesData = await response.json()
+          setCourses(coursesData);
+        } catch (error) {
+          console.log('Error fetching courses: ', error);
+        }
+      } else {
+        console.log('Response not ok: ', response);
+      }
+    }
+    getCourses();
+  }, [])
+
+  // Delete later. This is just to see what courses is
+  useEffect(() => {
+    console.log('Courses set: ', courses);
+  }, [courses])
+
   return (
     <div className="school-catalog">
       <h1>School Catalog</h1>
