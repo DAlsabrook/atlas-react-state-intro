@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function SchoolCatalog() {
   const [courses, setCourses] = useState({})
+  const [displayedCourses, setDisplayedCourses] = useState({})
   const [searchValue, setSearchValue] = useState('')
 
   // Fetch from courses.json
@@ -12,6 +13,7 @@ export default function SchoolCatalog() {
         try {
           const coursesData = await response.json()
           setCourses(coursesData);
+          setDisplayedCourses(coursesData);
         } catch (error) {
           console.log('Error fetching courses: ', error);
         }
@@ -24,13 +26,28 @@ export default function SchoolCatalog() {
 
   // Watch the search value
   useEffect(() => {
-    // this need to update the table
+    setDisplayedCourses({});
+    if (searchValue === '' || searchValue === null) {
+      setDisplayedCourses(courses);
+      console.log('search value null or empty');
+      return;
+    }
+    let newDisplayedCourses = []
+    // find all name that contain the value
+    Object.keys(courses).map((key) => {
+      const name = courses[key].courseName.toLowerCase();
+      if (searchValue && name.includes(searchValue.toLowerCase())) {
+        newDisplayedCourses.push(courses[key]);
+      }
+    });
+    setDisplayedCourses(newDisplayedCourses);
   }, [searchValue])
 
-  // Delete later. This is just to see what courses is
-  useEffect(() => {
-    console.log('Courses set: ', courses);
-  }, [courses])
+  // Delete later. Just ot watch what is going on.
+  // useEffect(() => {
+  //   console.log(searchValue)
+  //   console.log('displayedCourses set: ', displayedCourses);
+  // }, [displayedCourses])
 
   return (
     <div className="school-catalog">
@@ -48,14 +65,14 @@ export default function SchoolCatalog() {
           </tr>
         </thead>
         <tbody>
-          {courses && Object.keys(courses).map((key, index) => {
+          {displayedCourses && Object.keys(displayedCourses).map((key, index) => {
             return (
               <tr key={index}>
-                <td>{courses[key].trimester}</td>
-                <td>{courses[key].courseNumber}</td>
-                <td>{courses[key].courseName}</td>
-                <td>{courses[key].semesterCredits}</td>
-                <td>{courses[key].totalClockHours}</td>
+                <td>{displayedCourses[key].trimester}</td>
+                <td>{displayedCourses[key].courseNumber}</td>
+                <td>{displayedCourses[key].courseName}</td>
+                <td>{displayedCourses[key].semesterCredits}</td>
+                <td>{displayedCourses[key].totalClockHours}</td>
                 <td>
                   <button>Enroll</button>
                 </td>
