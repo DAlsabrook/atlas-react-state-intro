@@ -29,14 +29,14 @@ export default function SchoolCatalog() {
     setDisplayedCourses({});
     if (searchValue === '' || searchValue === null) {
       setDisplayedCourses(courses);
-      console.log('search value null or empty');
       return;
     }
     let newDisplayedCourses = []
     // find all name that contain the value
     Object.keys(courses).map((key) => {
       const name = courses[key].courseName.toLowerCase();
-      if (searchValue && name.includes(searchValue.toLowerCase())) {
+      const number = courses[key].courseNumber.toLowerCase();
+      if (number.includes(searchValue.toLowerCase()) || name.includes(searchValue.toLowerCase())) {
         newDisplayedCourses.push(courses[key]);
       }
     });
