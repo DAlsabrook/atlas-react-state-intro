@@ -4,6 +4,13 @@ export default function SchoolCatalog() {
   const [courses, setCourses] = useState({})
   const [displayedCourses, setDisplayedCourses] = useState({})
   const [searchValue, setSearchValue] = useState('')
+  const [directionFlag, setDirectionFlag] = useState({
+    'trimester': 0,
+    'courseNumber': 0,
+    'courseName': 0,
+    'semesterCredits': 0,
+    'totalClockHours': 0,
+  });
 
   // Fetch from courses.json
   useEffect(() => {
@@ -43,11 +50,22 @@ export default function SchoolCatalog() {
     setDisplayedCourses(newDisplayedCourses);
   }, [searchValue])
 
-  // Delete later. Just ot watch what is going on.
-  // useEffect(() => {
-  //   console.log(searchValue)
-  //   console.log('displayedCourses set: ', displayedCourses);
-  // }, [displayedCourses])
+  const handleHeaderFilter = (headerName) => {
+    const sortedCourses = [...Object.values(displayedCourses)].sort((a, b) => {
+      const aValue = a[headerName].toString();
+      const bValue = b[headerName].toString();
+      if (directionFlag[headerName]) {
+        return bValue.localeCompare(aValue);
+      } else {
+        return aValue.localeCompare(bValue);
+      }
+    });
+    setDirectionFlag((prevFlag) => ({
+      ...prevFlag,
+      [headerName]: prevFlag[headerName] ? 0 : 1,
+    }));
+    setDisplayedCourses(sortedCourses);
+  }
 
   return (
     <div className="school-catalog">
@@ -56,11 +74,11 @@ export default function SchoolCatalog() {
       <table>
         <thead>
           <tr>
-            <th>Trimester</th>
-            <th>Course Number</th>
-            <th>Courses Name</th>
-            <th>Semester Credits</th>
-            <th>Total Clock Hours</th>
+            <th onClick={() => handleHeaderFilter('trimester')} style={{cursor: 'pointer'}}>Trimester</th>
+            <th onClick={() => handleHeaderFilter('courseNumber')} style={{cursor: 'pointer'}}>Course Number</th>
+            <th onClick={() => handleHeaderFilter('courseName')} style={{cursor: 'pointer'}}>Courses Name</th>
+            <th onClick={() => handleHeaderFilter('semesterCredits')} style={{cursor: 'pointer'}}>Semester Credits</th>
+            <th onClick={() => handleHeaderFilter('totalClockHours')} style={{cursor: 'pointer'}}>Total Clock Hours</th>
             <th>Enroll</th>
           </tr>
         </thead>
