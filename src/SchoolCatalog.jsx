@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserCoursesContext } from './courseContext'
 
 export default function SchoolCatalog() {
   const [courses, setCourses] = useState({})
@@ -11,6 +12,10 @@ export default function SchoolCatalog() {
     'semesterCredits': 0,
     'totalClockHours': 0,
   });
+  const [paginationPage, setPaginationPage] = useState(1)
+  const [disablePrev, setDisablePrev] = useState(true)
+  const [disableNext, setDisableNext] = useState(false)
+  const { enrollCourse } = useContext(UserCoursesContext)
 
   // Fetch from courses.json
   useEffect(() => {
@@ -67,6 +72,32 @@ export default function SchoolCatalog() {
     setDisplayedCourses(sortedCourses);
   }
 
+  const itemsPerPage = 5;
+  const startIndex = (paginationPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const handleNextPage = () => {
+    const currentPage = paginationPage;
+    if (disableNext) return
+    setPaginationPage(currentPage + 1)
+  }
+
+  const handlePrevPage = () => {
+    if (disablePrev) return
+    const currentPage = paginationPage;
+    setPaginationPage(currentPage - 1)
+  }
+
+  useEffect(() => {
+    if (paginationPage > 1) {
+      setDisablePrev(false)
+    } else setDisablePrev(true)
+
+    if (displayedCourses[endIndex]) {
+      setDisableNext(false)
+    } else setDisableNext(true)
+  }, [paginationPage, displayedCourses])
+
   return (
     <div className="school-catalog">
       <h1>School Catalog</h1>
@@ -83,8 +114,7 @@ export default function SchoolCatalog() {
           </tr>
         </thead>
         <tbody>
-          {displayedCourses && Object.keys(displayedCourses).map((key, index) => {
-            return (
+            {displayedCourses && Object.keys(displayedCourses).slice(startIndex, endIndex).map((key, index) => (
               <tr key={index}>
                 <td>{displayedCourses[key].trimester}</td>
                 <td>{displayedCourses[key].courseNumber}</td>
@@ -92,16 +122,27 @@ export default function SchoolCatalog() {
                 <td>{displayedCourses[key].semesterCredits}</td>
                 <td>{displayedCourses[key].totalClockHours}</td>
                 <td>
-                  <button>Enroll</button>
+                  <button onClick={() => enrollCourse(displayedCourses[key])}>Enroll</button>
                 </td>
               </tr>
-            )
-          })}
+            ))}
         </tbody>
       </table>
       <div className="pagination">
-        <button>Previous</button>
-        <button>Next</button>
+        <button
+          onClick={handlePrevPage}
+          disabled={disablePrev}
+          style={{ opacity: disablePrev ? '.8' : '1' }}
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={disableNext}
+          style={{ opacity: disableNext ? '.8' : '1' }}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
